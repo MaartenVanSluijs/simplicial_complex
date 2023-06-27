@@ -20,6 +20,7 @@ class Vertex:
         self.y = y
         self.grid_x = grid_x
         self.grid_y = grid_y
+        self.drag = False
         
     def move(self, x: int, y: int):
         '''
