@@ -6,6 +6,10 @@ import sys
 
 class App():
 
+    '''
+        The app
+    '''
+
     def __init__(self):
 
         self.SIZE = WIDTH, HEIGHT = 1000, 620
@@ -25,6 +29,9 @@ class App():
         self.vertices: list[Vertex] = []
 
     def run(self):
+        '''
+            Contains the main loop, routes actions, and updates the screen
+        '''
 
         while True:
 
@@ -44,8 +51,14 @@ class App():
             pygame.display.flip()
 
     def handle_mousepress(self, event: pygame.event):
-        position = event.pos
+        '''
+            Handles mousepresses.
 
+                Parameters: 
+                    event (pygame.event): the mouse_pressed event
+        '''
+
+        position = event.pos
 
         if pygame.mouse.get_pressed()[0]:
             vertex = Vertex(position[0], position[1])
@@ -58,6 +71,10 @@ class App():
                     self.vertices.remove(vertex)
         
     def render_screen(self):
+        '''
+            Renders the app elements on the screen
+        '''
+
         self.SCREEN.fill(self.WHITE)
         for vertex in self.vertices:
             pygame.draw.circle(self.SCREEN, self.BLACK, (vertex.x, vertex.y), self.RADIUS)
