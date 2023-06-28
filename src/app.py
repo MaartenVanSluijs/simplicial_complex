@@ -1,8 +1,10 @@
 from src.vertex import Vertex
 
-import pygame
 import sys
-
+import pygame
+import pygame_widgets as widgets
+from pygame_widgets.toggle import Toggle
+from pygame_widgets.button import Button
 
 class App():
 
@@ -12,13 +14,15 @@ class App():
 
     def __init__(self):
 
-        self.SIZE = WIDTH, HEIGHT = 1000, 620
+        self.SIZE = self.WIDTH, self.HEIGHT = 1000, 700
         self.SCREEN = pygame.display.set_mode(self.SIZE)
+        self.INFO_SIZE = 80
         self.FRAME_RATE = 60
         self.RADIUS = 10
         
         self.WHITE = (255,255,255)
         self.BLACK = (0,0,0)
+        self.GRAY = (150,150,150)
 
         pygame.init()
 
@@ -29,6 +33,7 @@ class App():
         self.vertices: list[Vertex] = []
 
     def run(self):
+
         '''
             Contains the main loop, routes actions, and updates the screen
         '''
@@ -51,29 +56,38 @@ class App():
                     self.handle_movement(event)
 
 
-            self.render_screen()
+            self.render_screen(pygame.event.get())
             pygame.display.flip()
 
     def handle_movement(self, event: pygame.event):
+
         '''
             Handles mouse movement, drags points across the screen when they are selected
 
             Parameters:
                 event (pygame.event): The event that triggered this function
         '''
+        
         position = event.pos
+        # Loop through all vertices
         for vertex in self.vertices:
+            # If the to be dragged vertices are found
             if vertex.drag:
-                vertex.move(position[0], position[1])
+                # If the mouse is inside the canvas
+                if position[1] > self.INFO_SIZE:
+                    vertex.move(position[0], position[1])
 
     def handle_mouserelease(self):
+
         '''
             Handles mouse releases, stops dragging all points
         '''
+        
         for vertex in self.vertices:
             vertex.drag = False
 
     def handle_mousepress(self, event: pygame.event):
+
         '''
             Handles mousepresses.
 
@@ -98,8 +112,10 @@ class App():
 
             # If a point is not selected
             if not on_point:
-                vertex = Vertex(position[0], position[1])
-                self.vertices.append(vertex)
+                # If the click was on the canvas
+                if position[1] > self.INFO_SIZE:
+                    vertex = Vertex(position[0], position[1])
+                    self.vertices.append(vertex)
 
         # if the right mouse button is pressed
         elif pygame.mouse.get_pressed()[2]:
@@ -108,24 +124,37 @@ class App():
                 if distance < self.RADIUS:
                     self.vertices.remove(vertex)
         
-    def render_screen(self):
+    def render_screen(self, events):
+        
         '''
             Renders the app elements on the screen
         '''
 
+        # Fill the screen with white
         self.SCREEN.fill(self.WHITE)
+
+        self.draw_menu()
+
+        # Draw all the vertices
         for vertex in self.vertices:
             pygame.draw.circle(self.SCREEN, self.BLACK, (vertex.x, vertex.y), self.RADIUS)
 
     def compute_distance(self, first_point: tuple[int], second_point: tuple[int]) -> float:
+        
         '''
             Computes the euclidian distance between two points
 
             Parameters:
                 first_point (tuple(int)): The coordinates of the first point
                 second_point (tuple(int)): The coordinates of the second point
+        
         '''
         diff = (first_point[0] - second_point[0], first_point[1] - second_point[1])
         distance = (diff[0]**2 + diff[1]**2) ** 0.5
         return distance
         
+    def draw_menu(self):
+        # Draw the menu box on the top
+        menu_rectangle = pygame.Rect(0, 0, self.WIDTH, self.INFO_SIZE)
+        pygame.draw.rect(self.SCREEN, self.GRAY, menu_rectangle)
+        pygame.draw.line(self.SCREEN, self.BLACK, (0, self.INFO_SIZE), (self.WIDTH, self.INFO_SIZE), 3)
